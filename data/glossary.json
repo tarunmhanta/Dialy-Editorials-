@@ -2,29 +2,157 @@
   "lastUpdated": "2026-09-09T08:00:00Z",
   "terms": [
     {
-      "term": "China Plus One Strategy",
-      "definition": "A global business strategy where multinational corporations diversify their supply chains beyond China to avoid over-reliance on a single country.",
-      "simpleExplanation": "Companies setting up backup factories in countries like India or Vietnam so they aren't completely dependent on Chinese factories.",
-      "example": "Apple expanding iPhone production lines across India and Vietnam alongside Chinese hubs.",
-      "mbaRelevance": "Crucial concept in Supply Chain Risk Management and Strategic Global Sourcing.",
+      "term": "Bilateral Relations",
+      "definition": "The relationship between two countries covering trade, defence, culture, and more.",
+      "simpleExplanation": "The relationship between two countries - covering trade, defence, culture, and more.",
       "editorials": [
         {
-          "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
-          "slug": "india-manufacturing-growth-strategy",
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
           "date": "2026-09-09"
         }
       ]
     },
     {
-      "term": "Production Linked Incentive (PLI)",
-      "definition": "A government scheme offering financial rewards to companies based on incremental sales from products manufactured in domestic units.",
-      "simpleExplanation": "A cash reward program from the government given to businesses that produce and sell more goods locally.",
-      "example": "Mobile phone manufacturers receiving a 4-6% financial incentive on additional phones produced in India.",
-      "mbaRelevance": "Demonstrates how public policy subsidies directly alter corporate CapEx strategy and unit economics.",
+      "term": "Defence Cooperation",
+      "definition": "Two countries working together on military training, equipment, and security.",
+      "simpleExplanation": "Two countries working together on military training, equipment, and security.",
       "editorials": [
         {
-          "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
-          "slug": "india-manufacturing-growth-strategy",
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Diplomacy",
+      "definition": "The work of managing relations between countries through talks and agreements, not fights.",
+      "simpleExplanation": "The work of managing relations between countries through talks and agreements, not fights.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Flag Meeting",
+      "definition": "A formal, peaceful meeting between army officers of two countries at the border to discuss and reduce tension.",
+      "simpleExplanation": "A formal, peaceful meeting between army officers of two countries at the border to discuss and reduce tension.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Geopolitical Risk",
+      "definition": "The danger to a business from political troubles between countries - wars, sanctions, or blocked routes.",
+      "simpleExplanation": "The danger to a business from political troubles between countries - wars, sanctions, or blocked routes.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Geopolitics",
+      "definition": "How geography, power, and politics between countries affect each other - and affect trade and business.",
+      "simpleExplanation": "How geography, power, and politics between countries affect each other - and affect trade and business.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Indian Ocean Region",
+      "definition": "The ocean area around India through which a large share of world trade and oil passes.",
+      "simpleExplanation": "The ocean area around India through which a large share of world trade and oil passes.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "LAC (Line of Actual Control)",
+      "definition": "The unofficial border line between India and China. It is not a settled international border.",
+      "simpleExplanation": "The unofficial border line between India and China. It is not a settled international border.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Maritime Security",
+      "definition": "Keeping the seas safe - for ships, trade routes, ports, and coastlines.",
+      "simpleExplanation": "Keeping the seas safe - for ships, trade routes, ports, and coastlines.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Neighbourhood First Policy",
+      "definition": "India's policy of giving top priority to friendly relations with its nearby countries.",
+      "simpleExplanation": "India's policy of giving top priority to friendly relations with its nearby countries.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Sanctions",
+      "definition": "Punishments (like trade bans) that countries put on other countries. They can suddenly change business conditions.",
+      "simpleExplanation": "Punishments (like trade bans) that countries put on other countries. They can suddenly change business conditions.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Sea Routes / Sea Lanes",
+      "definition": "The fixed paths on the ocean used by cargo ships. Trouble on these routes raises shipping costs for everyone.",
+      "simpleExplanation": "The fixed paths on the ocean used by cargo ships. Trouble on these routes raises shipping costs for everyone.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Supply Chain",
+      "definition": "The full journey of a product - from raw material to factory to transport to the customer.",
+      "simpleExplanation": "The full journey of a product - from raw material to factory to transport to the customer.",
+      "editorials": [
+        {
+          "title": "India and Its Neighbours - Borders, Oceans, and Business",
+          "slug": "india-and-its-neighbours-borders-oceans-and-business",
           "date": "2026-09-09"
         }
       ]

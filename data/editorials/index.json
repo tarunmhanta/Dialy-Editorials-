@@ -4,15 +4,16 @@
   "editorials": [
     {
       "id": "2026-09-09-editorial-01",
-      "slug": "india-manufacturing-growth-strategy",
+      "slug": "india-and-its-neighbours-borders-oceans-and-business",
+      "dayNumber": 5,
       "date": "2026-09-09",
-      "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
+      "title": "India and Its Neighbours - Borders, Oceans, and Business",
       "filePath": "2026/09/2026-09-09.json",
       "tags": [
-        "Economics",
+        "Geopolitics",
         "Government Policy",
         "Business Environment",
-        "Manufacturing"
+        "Supply Chain"
       ],
       "difficulty": "Intermediate"
     }

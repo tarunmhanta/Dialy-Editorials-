@@ -1,14 +1,9 @@
 /**
  * MBA EDITORIAL DAILY - EDITORIAL LOADER MODULE
- * Fetches JSON index, loads target editorial, and renders dynamic HTML content.
+ * Fetches index.json and renders exact 5-section MBA study guide format.
  */
 
 const EditorialLoader = {
-  /**
-   * Initializes homepage or detail page loading
-   * @param {string} containerId - Target HTML element ID for rendering
-   * @param {string|null} targetSlug - Optional slug filter for specific editorial detail view
-   */
   async init(containerId = 'editorial-app', targetSlug = null) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -16,7 +11,6 @@ const EditorialLoader = {
     Utils.renderLoading(container);
 
     try {
-      // Step 1: Fetch index.json
       const indexPath = Utils.getRelativePath('data/editorials/index.json');
       const indexResponse = await fetch(indexPath, { cache: 'no-cache' });
       
@@ -31,15 +25,13 @@ const EditorialLoader = {
         return;
       }
 
-      // Step 2: Determine which editorial to load
-      let targetMeta = indexData.editorials[0]; // Default to latest
+      let targetMeta = indexData.editorials[0];
 
       if (targetSlug) {
         const found = indexData.editorials.find(item => item.slug === targetSlug);
         if (found) targetMeta = found;
       }
 
-      // Step 3: Fetch detailed editorial JSON file
       const editorialJsonPath = Utils.getRelativePath(`data/editorials/${targetMeta.filePath}`);
       const editorialResponse = await fetch(editorialJsonPath);
 
@@ -48,11 +40,8 @@ const EditorialLoader = {
       }
 
       const editorial = await editorialResponse.json();
+      document.title = `Day ${editorial.dayNumber || 5}: ${editorial.mainTopic || editorial.title} | MBA Editorial Daily`;
 
-      // Step 4: Update document page title for SEO
-      document.title = `${editorial.title} | MBA Editorial Daily`;
-
-      // Step 5: Render full editorial UI
       this.renderEditorial(container, editorial);
 
     } catch (error) {
@@ -66,230 +55,139 @@ const EditorialLoader = {
     }
   },
 
-  /**
-   * Renders complete editorial layout
-   * @param {HTMLElement} container 
-   * @param {Object} data - Editorial JSON object
-   */
   renderEditorial(container, data) {
-    const tagsHtml = (data.tags || []).map(tag => 
-      `<span class="badge badge-blue">${Utils.escapeHTML(tag)}</span>`
-    ).join(' ');
+    const dayNum = data.dayNumber || 5;
+    const batchInfo = data.batchInfo || "For: MBA-I Batch (2026-28)";
+    const mainTopic = data.mainTopic || data.title;
+    const nextDayNum = dayNum + 1;
 
-    const difficultyBadge = data.difficulty ? 
-      `<span class="badge badge-slate">Level: ${Utils.escapeHTML(data.difficulty)}</span>` : '';
+    // Build Section 1 Items
+    let sec1Items = data.section1_simpleSummary || [];
+    if (sec1Items.length === 0 && data.summary) {
+      if (Array.isArray(data.summary.keyArguments)) {
+        sec1Items = data.summary.keyArguments.map((arg, idx) => ({
+          boldHeader: `Key Point ${idx + 1}`,
+          text: arg
+        }));
+      }
+    }
 
-    const readingTimeBadge = data.readingTimeMinutes ?
-      `<span class="badge badge-amber">⏱️ ${data.readingTimeMinutes} min read</span>` : '';
+    // Build Section 2 Items
+    let sec2Items = data.section2_mbaRelevance || [];
+    if (sec2Items.length === 0 && data.keyTakeaways) {
+      sec2Items = data.keyTakeaways.map((takeaway, idx) => ({
+        boldHeader: `Management Takeaway ${idx + 1}`,
+        text: takeaway
+      }));
+    }
 
-    // Render HTML structure
+    // Build Section 5 Keywords
+    let keywords = data.section5_keywords || [];
+    if (keywords.length === 0 && data.terminologies) {
+      keywords = data.terminologies.map(t => ({
+        word: t.term || t.word,
+        simpleMeaning: t.simpleMeaning || t.simpleExplanation || t.definition
+      }));
+    }
+
     container.innerHTML = `
-      <!-- Hero Header Section -->
-      <header class="hero-section">
+      <div class="editorial-analysis-wrapper">
         <div class="container">
-          <div class="hero-meta-bar">
-            <span class="today-tag">
-              <span style="display:inline-block; width:8px; height:8px; background-color:var(--brand-emerald); border-radius:50%;"></span>
-              Editorial Analysis
-            </span>
-            <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-              <span style="font-size:0.875rem; color:var(--text-muted); font-weight:500;">
-                📅 ${Utils.formatDate(data.date)}
-              </span>
-              ${difficultyBadge}
-              ${readingTimeBadge}
-            </div>
-          </div>
-
-          <h1 class="editorial-header-title">${Utils.escapeHTML(data.title)}</h1>
           
-          <div style="margin-top: 0.75rem;">
-            ${tagsHtml}
-          </div>
-
-          <!-- Source Attribution Card -->
-          <div class="source-attribution-card">
-            <div class="source-info">
-              <span class="source-name">Source: ${Utils.escapeHTML(data.source.name || 'Indian Express')}</span>
-              ${data.source.author ? `<span class="source-author">By ${Utils.escapeHTML(data.source.author)}</span>` : ''}
-            </div>
-            <a href="${Utils.escapeHTML(data.source.url)}" target="_blank" rel="noopener noreferrer" class="source-link-btn">
-              Read Original Editorial on Indian Express →
-            </a>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main Editorial Content Body -->
-      <div class="container">
-        <div class="editorial-container">
-
-          <!-- Section 1: Introduction -->
-          ${data.introduction ? `
-          <section class="section-block">
-            <div class="section-title-wrap">
-              <div class="section-icon">💡</div>
-              <h2 class="section-heading">Why This Editorial?</h2>
-            </div>
-            <div class="editorial-intro-p">
-              ${Utils.escapeHTML(data.introduction)}
-            </div>
-          </section>
-          ` : ''}
-
-          <!-- Section 2: Simplified Summary -->
-          <section class="section-block">
-            <div class="section-title-wrap">
-              <div class="section-icon">📖</div>
-              <h2 class="section-heading">Editorial in Simple Words</h2>
+          <!-- Top Day Header -->
+          <header class="day-analysis-header">
+            <div class="day-pill-badge">DAY ${dayNum}</div>
+            <h1 class="header-main-title">The Indian Express Editorial Analysis</h1>
+            
+            <div class="meta-sub-bar">
+              <span>Date: ${Utils.formatDate(data.date)}</span>
+              <span class="meta-divider">|</span>
+              <span>${Utils.escapeHTML(batchInfo)}</span>
             </div>
 
-            <div class="summary-grid">
-              ${data.summary.overview ? `
-              <div class="summary-card-sub">
-                <h4>📌 Overview</h4>
-                <p style="color:var(--text-secondary); font-size:0.975rem; line-height:1.7;">
-                  ${Utils.escapeHTML(data.summary.overview)}
-                </p>
-              </div>
-              ` : ''}
-
-              ${data.summary.howItIntroducesTheTopic ? `
-              <div class="summary-card-sub">
-                <h4>🎯 Context & Issue Framing</h4>
-                <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.6;">
-                  ${Utils.escapeHTML(data.summary.howItIntroducesTheTopic)}
-                </p>
-              </div>
-              ` : ''}
-
-              ${Array.isArray(data.summary.keyArguments) && data.summary.keyArguments.length > 0 ? `
-              <div class="summary-card-sub">
-                <h4>⚖️ Major Arguments</h4>
-                <ul class="summary-list">
-                  ${data.summary.keyArguments.map(arg => `<li>${Utils.escapeHTML(arg)}</li>`).join('')}
-                </ul>
-              </div>
-              ` : ''}
-
-              ${Array.isArray(data.summary.importantFacts) && data.summary.importantFacts.length > 0 ? `
-              <div class="summary-card-sub">
-                <h4>📊 Key Facts & Policy Context</h4>
-                <ul class="summary-list">
-                  ${data.summary.importantFacts.map(fact => `<li>${Utils.escapeHTML(fact)}</li>`).join('')}
-                </ul>
-              </div>
-              ` : ''}
-
-              ${data.summary.conclusion ? `
-              <div class="summary-card-sub" style="border-left: 3px solid var(--brand-emerald);">
-                <h4>🏁 Editorial Conclusion</h4>
-                <p style="color:var(--text-primary); font-weight:500; font-size:0.95rem; line-height:1.6;">
-                  ${Utils.escapeHTML(data.summary.conclusion)}
-                </p>
-              </div>
-              ` : ''}
-            </div>
-          </section>
-
-          <!-- Section 3: MBA Relevance Section -->
-          <section class="mba-relevance-box">
-            <h3>🎓 Why Should an MBA Student Care?</h3>
-            <p class="mba-relevance-desc">${Utils.escapeHTML(data.mbaRelevance.importance)}</p>
-
-            <div style="margin-bottom: 1.5rem;">
-              <h4 style="color:#94a3b8; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">
-                Related MBA 1st-Year Subjects
-              </h4>
-              <div class="mba-tags-row">
-                ${(data.mbaRelevance.subjects || []).map(sub => 
-                  `<span class="mba-subject-pill">📘 ${Utils.escapeHTML(sub)}</span>`
-                ).join('')}
-              </div>
+            <div class="main-topic-callout">
+              Today's Main Topic: <em><strong>${Utils.escapeHTML(mainTopic)}</strong></em>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-              <h4 style="color:#94a3b8; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">
-                Core Management Concepts
-              </h4>
-              <div class="mba-tags-row">
-                ${(data.mbaRelevance.managementConcepts || []).map(concept => 
-                  `<span class="mba-concept-pill">🧩 ${Utils.escapeHTML(concept)}</span>`
-                ).join('')}
-              </div>
+            <div class="read-original-wrap">
+              <a href="${Utils.escapeHTML(data.source.url)}" target="_blank" rel="noopener noreferrer" class="read-original-link">
+                [Read the full editorial here (The Indian Express)] →
+              </a>
             </div>
+          </header>
 
-            ${data.mbaRelevance.practicalBusinessConnection ? `
-            <div class="practical-connection-card">
-              <h4>🏢 Practical Business & Managerial Impact</h4>
-              <p>${Utils.escapeHTML(data.mbaRelevance.practicalBusinessConnection)}</p>
-            </div>
-            ` : ''}
-          </section>
-
-          <!-- Section 4: Key Takeaways -->
-          ${Array.isArray(data.keyTakeaways) && data.keyTakeaways.length > 0 ? `
-          <section class="section-block">
-            <div class="section-title-wrap">
-              <div class="section-icon">🚀</div>
-              <h2 class="section-heading">Key Learning Takeaways</h2>
-            </div>
-            <div class="takeaways-grid">
-              ${data.keyTakeaways.map((item, idx) => `
-                <div class="takeaway-card">
-                  <div class="takeaway-num">${idx + 1}</div>
-                  <div class="takeaway-text">${Utils.escapeHTML(item)}</div>
-                </div>
+          <!-- 1. What Does the Editorial Say? -->
+          <section class="analysis-section-card">
+            <h2 class="section-heading-numbered">1. What Does the Editorial Say? (Simple Summary)</h2>
+            <p class="section-intro-lead">Today's paper looks at key national developments:</p>
+            
+            <ul class="analysis-bullets-list">
+              ${sec1Items.map(item => `
+                <li>
+                  <strong>${Utils.escapeHTML(item.boldHeader)}:</strong> ${Utils.escapeHTML(item.text)}
+                </li>
               `).join('')}
-            </div>
+            </ul>
           </section>
-          ` : ''}
 
-          <!-- Section 5: Important Terminologies -->
-          ${Array.isArray(data.terminologies) && data.terminologies.length > 0 ? `
-          <section class="section-block">
-            <div class="section-title-wrap">
-              <div class="section-icon">📚</div>
-              <h2 class="section-heading">Important Terms You Should Know</h2>
-            </div>
-            <div class="terms-grid">
-              ${data.terminologies.map(term => `
-                <div class="term-card">
-                  <div class="term-header">
-                    <span class="term-title">${Utils.escapeHTML(term.term)}</span>
-                  </div>
-                  <div class="term-def">" ${Utils.escapeHTML(term.definition)} "</div>
-                  <div class="term-simple">
-                    <strong>Simple Explanation:</strong> ${Utils.escapeHTML(term.simpleExplanation)}
-                  </div>
-                  ${term.example ? `
-                  <div class="term-example">
-                    💡 <strong>Example:</strong> ${Utils.escapeHTML(term.example)}
-                  </div>
-                  ` : ''}
-                </div>
+          <!-- 2. What Is In It For You, As an MBA-I Student? -->
+          <section class="analysis-section-card">
+            <h2 class="section-heading-numbered">2. What Is In It For You, As an MBA-I Student?</h2>
+            
+            <ul class="analysis-bullets-list">
+              ${sec2Items.map(item => `
+                <li>
+                  <strong>${Utils.escapeHTML(item.boldHeader)}:</strong> ${Utils.escapeHTML(item.text)}
+                </li>
               `).join('')}
-            </div>
+            </ul>
           </section>
-          ` : ''}
 
-          <!-- Section 6: Think Like a Manager Discussion Question -->
-          ${data.discussionQuestion ? `
-          <section class="discussion-box">
-            <div class="section-title-wrap" style="border-bottom-color: #fde68a;">
-              <div class="section-icon" style="background-color:#fef3c7; color:#b45309;">🧠</div>
-              <h2 class="section-heading" style="color:#78350f;">Think Like a Manager</h2>
-            </div>
-            <p class="discussion-question-text">
-              "${Utils.escapeHTML(data.discussionQuestion.question)}"
+          <!-- 3. How Daily News Reading Broadens Your Thinking -->
+          <section class="analysis-section-card">
+            <h2 class="section-heading-numbered">3. How Daily News Reading Broadens Your Thinking</h2>
+            <p class="broadening-thinking-text">
+              ${Utils.escapeHTML(data.section3_broadeningThinking || data.introduction)}
             </p>
-            ${data.discussionQuestion.whyThinkAboutIt ? `
-            <div class="discussion-why">
-              💡 <strong>Why Consider This?</strong> ${Utils.escapeHTML(data.discussionQuestion.whyThinkAboutIt)}
-            </div>
-            ` : ''}
           </section>
-          ` : ''}
+
+          <!-- 4. Question of the Day -->
+          <section class="analysis-section-card question-box-card">
+            <h2 class="section-heading-numbered" style="color: #78350f;">4. Question of the Day (Think About It - We Will Discuss)</h2>
+            <p class="question-quote">
+              "${Utils.escapeHTML(data.section4_questionOfTheDay || (data.discussionQuestion ? data.discussionQuestion.question : ''))}"
+            </p>
+          </section>
+
+          <!-- 5. Keywords and Hard Words -->
+          <section class="analysis-section-card">
+            <h2 class="section-heading-numbered">5. Keywords and Hard Words (Simple Meanings)</h2>
+            <p class="keywords-subtitle"><em>Learn these words today. They will come again and again in your MBA journey.</em></p>
+            
+            <div class="table-responsive-container">
+              <table class="keywords-table">
+                <thead>
+                  <tr>
+                    <th>Word</th>
+                    <th>Simple Meaning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${keywords.map(kw => `
+                    <tr>
+                      <td class="word-col"><strong>${Utils.escapeHTML(kw.word || kw.term)}</strong></td>
+                      <td class="meaning-col">${Utils.escapeHTML(kw.simpleMeaning || kw.simpleExplanation || kw.definition)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Bottom Streak Progress Bar -->
+          <div class="streak-completion-footer">
+            🔥 <strong>Day ${dayNum} complete.</strong> Ten minutes a day, every day. See you tomorrow for Day ${nextDayNum}.
+          </div>
 
         </div>
       </div>
