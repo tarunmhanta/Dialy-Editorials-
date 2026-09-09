@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About & Methodology | MBA Editorial Daily</title>
+  <meta name="description" content="Learn about the MBA Editorial Daily platform, our educational methodology, AI processing pipeline, and Indian Express content attribution disclaimer.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand-logo" id="header-brand-logo">
+        <span class="brand-badge">MBA</span>
+        <div>
+          <span class="brand-name">Editorial Daily</span>
+          <span class="brand-sub">Express Analysis for Managers</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle Navigation Menu">☰</button>
+
+      <nav class="main-nav" id="main-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link" id="nav-home">Home</a>
+        <a href="archive.html" class="nav-link" id="nav-archive">Archive</a>
+        <a href="glossary.html" class="nav-link" id="nav-glossary">Glossary</a>
+        <a href="about.html" class="nav-link active" id="nav-about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- About Content -->
+  <main class="main-content">
+    <div class="container" style="max-width: var(--max-reading-width);">
+      
+      <header style="margin-bottom: 2.5rem; text-align: center;">
+        <span class="badge badge-blue" style="margin-bottom: 0.75rem;">Educational Initiative</span>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.75rem;">
+          Bridging Public Policy & Management Learning
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 1.15rem; line-height: 1.6;">
+          Transforming daily national news editorials into structured, exam-oriented management studies for MBA first-year students.
+        </p>
+      </header>
+
+      <div style="display: flex; flex-direction: column; gap: 2rem;">
+
+        <section class="card">
+          <h2 style="font-size: 1.4rem; color: var(--brand-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            🎯 Objective & Purpose
+          </h2>
+          <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem;">
+            MBA first-year curricula require students to quickly connect theoretical concepts—such as monetary policy, fiscal deficit, market structure, supply chain resilience, and corporate strategy—with real-world business events.
+          </p>
+          <p style="color: var(--text-secondary); line-height: 1.7;">
+            <strong>MBA Editorial Daily</strong> automates this bridge. Every morning, our system analyzes key opinion pieces and editorials from <em>The Indian Express</em>, extracts management relevance, simplifies complex jargon, and highlights actionable takeaways for classroom discussions, case competitions, and exams.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2 style="font-size: 1.4rem; color: var(--brand-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            ⚡ How the Platform Works
+          </h2>
+          <ol style="padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.8; display: flex; flex-direction: column; gap: 0.75rem;">
+            <li><strong>Automated Discovery:</strong> Python routines monitor the latest published editorials from <em>The Indian Express</em>.</li>
+            <li><strong>Clean Extraction:</strong> Page noise, ads, and navigation links are stripped to isolate core editorial arguments.</li>
+            <li><strong>Gemini AI Educational Synthesis:</strong> Google Gemini AI processes the text using specialized MBA prompts to extract management implications, subjects, and key takeaways.</li>
+            <li><strong>Static GitHub Database:</strong> Results are validated into schema-compliant JSON files stored directly within our public repository and published statically to GitHub Pages.</li>
+          </ol>
+        </section>
+
+        <section class="card" style="border-left: 4px solid var(--brand-amber);">
+          <h2 style="font-size: 1.4rem; color: var(--brand-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+            📜 Source Attribution & Legal Disclaimer
+          </h2>
+          <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 1rem;">
+            MBA Editorial Daily is an independent educational tool created solely for academic analysis, research, and self-study by business administration students.
+          </p>
+          <ul style="padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.7; display: flex; flex-direction: column; gap: 0.5rem;">
+            <li>This site <strong>does not republish or redistribute full original article texts</strong> from <em>The Indian Express</em>.</li>
+            <li>All summaries, terminology definitions, and MBA connections are independently generated AI educational interpretations.</li>
+            <li>Each summary includes direct links back to the original <em>Indian Express</em> article page to encourage readership of the original journalism.</li>
+            <li>This platform is not affiliated with, endorsed by, or sponsored by <em>The Indian Express</em> or its parent publishers.</li>
+          </ul>
+        </section>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-disclaimer">
+        <p>MBA Editorial Daily Educational Platform.</p>
+        <p>© 2026 MBA Editorial Daily.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

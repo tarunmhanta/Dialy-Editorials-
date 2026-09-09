@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editorial Archive | MBA Editorial Daily</title>
+  <meta name="description" content="Browse all previous Indian Express editorial educational summaries filtered by subject, year, month, difficulty, and MBA management concepts.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand-logo" id="header-brand-logo">
+        <span class="brand-badge">MBA</span>
+        <div>
+          <span class="brand-name">Editorial Daily</span>
+          <span class="brand-sub">Express Analysis for Managers</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle Navigation Menu">☰</button>
+
+      <nav class="main-nav" id="main-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link" id="nav-home">Home</a>
+        <a href="archive.html" class="nav-link active" id="nav-archive">Archive</a>
+        <a href="glossary.html" class="nav-link" id="nav-glossary">Glossary</a>
+        <a href="about.html" class="nav-link" id="nav-about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Archive Main Content -->
+  <main class="main-content">
+    <div class="container">
+      
+      <header style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">
+          Editorial Repository Archive
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 1.05rem;">
+          Search and filter historical Indian Express editorial summaries prepared for MBA coursework revision.
+        </p>
+      </header>
+
+      <!-- Filter Controls Bar -->
+      <section class="card" style="margin-bottom: 2rem; padding: 1.5rem; background-color: var(--bg-surface);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+          
+          <!-- Search Input -->
+          <div style="grid-column: span 2;">
+            <label for="archive-search" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">
+              Search Title or Topic
+            </label>
+            <input type="text" id="archive-search" placeholder="e.g. Manufacturing, Fiscal Policy, Inflation..." 
+                   style="width:100%; padding:0.65rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:0.95rem;">
+          </div>
+
+          <!-- Year Filter -->
+          <div>
+            <label for="filter-year" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">Year</label>
+            <select id="filter-year" style="width:100%; padding:0.65rem 0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:0.95rem; background-color:white;">
+              <option value="">All Years</option>
+            </select>
+          </div>
+
+          <!-- Month Filter -->
+          <div>
+            <label for="filter-month" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">Month</label>
+            <select id="filter-month" style="width:100%; padding:0.65rem 0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:0.95rem; background-color:white;">
+              <option value="">All Months</option>
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+
+          <!-- Topic / Tag Filter -->
+          <div>
+            <label for="filter-tag" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">Tag / Subject</label>
+            <select id="filter-tag" style="width:100%; padding:0.65rem 0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:0.95rem; background-color:white;">
+              <option value="">All Tags</option>
+            </select>
+          </div>
+
+          <!-- Difficulty Filter -->
+          <div>
+            <label for="filter-difficulty" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">Difficulty</label>
+            <select id="filter-difficulty" style="width:100%; padding:0.65rem 0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:0.95rem; background-color:white;">
+              <option value="">All Levels</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div style="display:flex; justify-between; align-items:center; font-size:0.875rem; color:var(--text-muted);">
+          <span id="archive-count">Loading archive records...</span>
+        </div>
+      </section>
+
+      <!-- Archive Cards Grid -->
+      <div id="archive-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem;">
+        <!-- Dynamic Cards rendered by js/archive.js -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-disclaimer">
+        <p>MBA Editorial Daily Archive Repository. Educational analysis platform for MBA students.</p>
+        <p>© 2026 MBA Editorial Daily.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/archive.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

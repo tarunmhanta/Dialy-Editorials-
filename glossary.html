@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business & Economics Glossary | MBA Editorial Daily</title>
+  <meta name="description" content="Comprehensive dictionary of economic, management, policy, and business terms extracted from Indian Express editorials for MBA students.">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand-logo" id="header-brand-logo">
+        <span class="brand-badge">MBA</span>
+        <div>
+          <span class="brand-name">Editorial Daily</span>
+          <span class="brand-sub">Express Analysis for Managers</span>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle Navigation Menu">☰</button>
+
+      <nav class="main-nav" id="main-nav" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link" id="nav-home">Home</a>
+        <a href="archive.html" class="nav-link" id="nav-archive">Archive</a>
+        <a href="glossary.html" class="nav-link active" id="nav-glossary">Glossary</a>
+        <a href="about.html" class="nav-link" id="nav-about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Glossary Main Content -->
+  <main class="main-content">
+    <div class="container">
+      
+      <header style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">
+          Business & Economics Glossary
+        </h1>
+        <p style="color: var(--text-secondary); font-size: 1.05rem;">
+          Master key management terminology, economic concepts, and public policy definitions extracted from daily editorials.
+        </p>
+      </header>
+
+      <!-- Search & Alphabet Bar Section -->
+      <section class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+        <div style="margin-bottom: 1.25rem;">
+          <label for="glossary-search" style="display:block; font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin-bottom:0.35rem;">
+            Search Terminology
+          </label>
+          <input type="text" id="glossary-search" placeholder="e.g. Fiscal Deficit, Supply Chain Bottleneck, Liquidity..." 
+                 style="width:100%; padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-medium); font-size:1rem;">
+        </div>
+
+        <!-- Alphabet Quick Jump Bar -->
+        <div id="alphabet-bar" style="display:flex; flex-wrap:wrap; gap:0.35rem; align-items:center;">
+          <!-- Rendered dynamically by js/glossary.js -->
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted);">
+          <span id="glossary-count">Loading terminology database...</span>
+        </div>
+      </section>
+
+      <!-- Terminology Grid -->
+      <div id="glossary-container" class="terms-grid">
+        <!-- Dynamic Cards rendered by js/glossary.js -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-disclaimer">
+        <p>MBA Editorial Daily Business Glossary. Independent educational learning resource.</p>
+        <p>© 2026 MBA Editorial Daily.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/glossary.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

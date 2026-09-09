@@ -1,0 +1,33 @@
+{
+  "lastUpdated": "2026-09-09T08:00:00Z",
+  "terms": [
+    {
+      "term": "China Plus One Strategy",
+      "definition": "A global business strategy where multinational corporations diversify their supply chains beyond China to avoid over-reliance on a single country.",
+      "simpleExplanation": "Companies setting up backup factories in countries like India or Vietnam so they aren't completely dependent on Chinese factories.",
+      "example": "Apple expanding iPhone production lines across India and Vietnam alongside Chinese hubs.",
+      "mbaRelevance": "Crucial concept in Supply Chain Risk Management and Strategic Global Sourcing.",
+      "editorials": [
+        {
+          "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
+          "slug": "india-manufacturing-growth-strategy",
+          "date": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "term": "Production Linked Incentive (PLI)",
+      "definition": "A government scheme offering financial rewards to companies based on incremental sales from products manufactured in domestic units.",
+      "simpleExplanation": "A cash reward program from the government given to businesses that produce and sell more goods locally.",
+      "example": "Mobile phone manufacturers receiving a 4-6% financial incentive on additional phones produced in India.",
+      "mbaRelevance": "Demonstrates how public policy subsidies directly alter corporate CapEx strategy and unit economics.",
+      "editorials": [
+        {
+          "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
+          "slug": "india-manufacturing-growth-strategy",
+          "date": "2026-09-09"
+        }
+      ]
+    }
+  ]
+}

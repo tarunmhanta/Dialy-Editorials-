@@ -1,0 +1,77 @@
+{
+  "id": "2026-09-09-editorial-01",
+  "slug": "india-manufacturing-growth-strategy",
+  "date": "2026-09-09",
+  "title": "Boosting India's Manufacturing: Policy, Productivity, and Global Competition",
+  "source": {
+    "name": "The Indian Express",
+    "url": "https://indianexpress.com/article/opinion/editorials/boosting-indias-manufacturing-policy-productivity-and-global-competition/",
+    "author": "Editorial Board"
+  },
+  "introduction": "This editorial analyzes India's strategic push to bolster domestic manufacturing through Production Linked Incentive (PLI) schemes and logistics infrastructure development, highlighting key challenges and global supply chain reconfigurations.",
+  "summary": {
+    "overview": "An in-depth evaluation of India's manufacturing performance, examining how supply chain diversification, policy incentives, and infrastructure investment can drive sustainable economic expansion.",
+    "howItIntroducesTheTopic": "The article frames manufacturing growth not merely as an industrial objective, but as an urgent macroeconomic necessity for job creation and export competitiveness in post-pandemic global trade.",
+    "keyArguments": [
+      "Production-Linked Incentive (PLI) schemes require targeted execution and faster disbursals to benefit medium-scale enterprises.",
+      "Logistics bottlenecks and energy costs remain primary friction points reducing price competitiveness against Southeast Asian exporters.",
+      "Skill alignment and R&D investment are essential to transition from low-margin assembly to high-value added domestic production."
+    ],
+    "importantFacts": [
+      "Manufacturing contributes approximately 17% to India's GDP, with a strategic goal to elevate it to 25%.",
+      "Global 'China Plus One' supply chain strategies present a multi-billion dollar window for Indian industrial exports.",
+      "PM Gati Shakti infrastructure initiative aims to reduce national logistics costs from 13% to under 9% of GDP."
+    ],
+    "conclusion": "India must urgently pair financial incentives with deep structural reforms in land, labor, and logistics to build global-scale manufacturing champions."
+  },
+  "mbaRelevance": {
+    "importance": "Understanding industrial policy and manufacturing competitiveness is fundamental for MBA students studying Managerial Economics, Supply Chain Strategy, and Global Business Policy.",
+    "subjects": [
+      "Managerial Economics",
+      "Business Environment",
+      "Operations & Supply Chain Management",
+      "Strategic Management"
+    ],
+    "managementConcepts": [
+      "Competitive Advantage",
+      "Economy of Scale",
+      "Supply Chain Risk Management",
+      "Public Policy & Industrial Strategy"
+    ],
+    "practicalBusinessConnection": "Multinational companies deciding on capital expenditure (CapEx) investments analyze local logistics efficiency, regulatory ease, and supply chain maturity before relocating manufacturing bases."
+  },
+  "keyTakeaways": [
+    "Industrial incentives require supporting infrastructure and reduced logistics costs to generate sustainable ROI.",
+    "Global supply chain realignments ('China Plus One') create strategic entry points for emerging market exporters.",
+    "High value creation requires transitioning from simple assembly to localized supply chain integration and R&D."
+  ],
+  "terminologies": [
+    {
+      "term": "Production Linked Incentive (PLI)",
+      "definition": "A government scheme offering financial rewards to companies based on incremental sales from products manufactured in domestic units.",
+      "simpleExplanation": "A cash reward program from the government given to businesses that produce and sell more goods locally.",
+      "example": "Mobile phone manufacturers receiving a 4-6% financial incentive on additional phones produced in India.",
+      "mbaRelevance": "Demonstrates how public policy subsidies directly alter corporate CapEx strategy and unit economics."
+    },
+    {
+      "term": "China Plus One Strategy",
+      "definition": "A global business strategy where multinational corporations diversify their supply chains beyond China to avoid over-reliance on a single country.",
+      "simpleExplanation": "Companies setting up backup factories in countries like India or Vietnam so they aren't completely dependent on Chinese factories.",
+      "example": "Apple expanding iPhone production lines across India and Vietnam alongside Chinese hubs.",
+      "mbaRelevance": "Crucial concept in Supply Chain Risk Management and Strategic Global Sourcing."
+    }
+  ],
+  "discussionQuestion": {
+    "question": "If you were the Chief Operating Officer (COO) of a global consumer electronics brand planning a $500M manufacturing investment in Asia, what quantitative and qualitative factors would determine whether you choose India over Vietnam?",
+    "whyThinkAboutIt": "Forces first-year MBA students to evaluate multi-criteria capital allocation, country-risk analysis, and supply chain logistics costs."
+  },
+  "tags": [
+    "Economics",
+    "Government Policy",
+    "Business Environment",
+    "Manufacturing"
+  ],
+  "difficulty": "Intermediate",
+  "readingTimeMinutes": 5,
+  "generatedAt": "2026-09-09T08:00:00Z"
+}
