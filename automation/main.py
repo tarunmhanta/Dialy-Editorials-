@@ -108,7 +108,13 @@ def run_pipeline() -> bool:
 if __name__ == "__main__":
     try:
         res = run_pipeline()
-        sys.exit(0)
+        if res:
+            sys.exit(0)  # Success - new editorial processed
+        else:
+            logger.info("No new editorial processed today. Exiting with code 2.")
+            sys.exit(2)  # No new article - not an error, just nothing to do
+    except SystemExit:
+        raise
     except Exception as err:
         logger.error(f"Pipeline uncaught failure: {err}")
         sys.exit(1)

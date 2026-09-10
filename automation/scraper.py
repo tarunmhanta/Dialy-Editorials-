@@ -7,6 +7,8 @@ from typing import List, Dict, Any, Optional
 import requests
 from bs4 import BeautifulSoup
 import time
+from datetime import datetime, timezone, timedelta
+from email.utils import parsedate_to_datetime
 
 from config import (
     INDIAN_EXPRESS_EDITORIAL_URL,
@@ -16,6 +18,9 @@ from config import (
     HTTP_MAX_RETRIES
 )
 from logger import logger
+
+# IST = UTC+5:30
+IST = timezone(timedelta(hours=5, minutes=30))
 
 class EditorialScraper:
     """
@@ -95,38 +100,80 @@ class EditorialScraper:
     def discover_editorials_from_rss(self, xml_content: str) -> List[Dict[str, Any]]:
         """
         Parses Indian Express editorial RSS Feed XML as a fallback mechanism.
+        Filters to only TODAY's articles (IST), sorted newest first.
+        Falls back to last 3 days if no today's articles found.
         """
         soup = BeautifulSoup(xml_content, "xml")
         if not soup.find("item"):
-            soup = BeautifulSoup(xml_content, "html.parser") # Fallback parser if lxml xml missing
+            soup = BeautifulSoup(xml_content, "html.parser")  # Fallback parser if lxml xml missing
 
         items = soup.find_all("item")
-        candidates: List[Dict[str, Any]] = []
+        now_ist = datetime.now(IST)
+        today_ist = now_ist.date()
+
+        logger.info(f"Current date in IST: {today_ist}")
+
+        all_editorial_candidates: List[Dict[str, Any]] = []
+        today_candidates: List[Dict[str, Any]] = []
 
         for item in items:
             title_tag = item.find("title")
             link_tag = item.find("link")
             pub_date_tag = item.find("pubDate")
 
-            if title_tag and link_tag:
-                title = title_tag.get_text(strip=True)
-                url = link_tag.get_text(strip=True)
-                if "?" in url:
-                    url = url.split("?")[0]
-                
-                pub_date = pub_date_tag.get_text(strip=True) if pub_date_tag else ""
+            if not (title_tag and link_tag):
+                continue
 
-                if "/article/opinion/editorials/" in url:
-                    candidates.append({
-                        "title": title,
-                        "url": url,
-                        "date_raw": pub_date,
-                        "author": "Editorial Board",
-                        "source": "The Indian Express"
-                    })
+            title = title_tag.get_text(strip=True)
+            url = link_tag.get_text(strip=True)
+            if "?" in url:
+                url = url.split("?")[0]
 
-        logger.info(f"RSS Discovery found {len(candidates)} candidate editorial items.")
-        return candidates
+            if "/article/opinion/editorials/" not in url:
+                continue
+
+            pub_date_raw = pub_date_tag.get_text(strip=True) if pub_date_tag else ""
+            pub_datetime = None
+            pub_date_local = None
+
+            if pub_date_raw:
+                try:
+                    pub_datetime = parsedate_to_datetime(pub_date_raw)
+                    pub_datetime = pub_datetime.astimezone(IST)
+                    pub_date_local = pub_datetime.date()
+                except Exception:
+                    pass
+
+            candidate = {
+                "title": title,
+                "url": url,
+                "date_raw": pub_date_raw,
+                "pub_datetime": pub_datetime,
+                "author": "Editorial Board",
+                "source": "The Indian Express"
+            }
+
+            all_editorial_candidates.append(candidate)
+
+            if pub_date_local and pub_date_local == today_ist:
+                today_candidates.append(candidate)
+
+        # Sort all candidates by date, newest first
+        all_editorial_candidates.sort(
+            key=lambda x: x["pub_datetime"] or datetime(2000, 1, 1, tzinfo=IST),
+            reverse=True
+        )
+
+        if today_candidates:
+            logger.info(f"RSS Discovery found {len(today_candidates)} TODAY's editorial(s) out of {len(all_editorial_candidates)} total.")
+            today_candidates.sort(
+                key=lambda x: x["pub_datetime"] or datetime(2000, 1, 1, tzinfo=IST),
+                reverse=True
+            )
+            return today_candidates
+        else:
+            logger.warning(f"No editorials found for today ({today_ist}). Returning the {min(5, len(all_editorial_candidates))} most recent items as fallback.")
+            return all_editorial_candidates[:5]
 
     def get_latest_editorial_candidates(self) -> List[Dict[str, Any]]:
         """
