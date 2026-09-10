@@ -14,7 +14,7 @@ const GlossaryPage = {
     Utils.renderLoading(container);
 
     try {
-      const glossaryPath = Utils.getRelativePath('data/glossary.json');
+      const glossaryPath = Utils.getRelativePath('data/glossary.json') + '?t=' + Date.now();
       const response = await fetch(glossaryPath, { cache: 'no-cache' });
 
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);

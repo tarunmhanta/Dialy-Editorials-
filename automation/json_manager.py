@@ -44,6 +44,18 @@ class JSONManager:
             slug = ai_data.get("slug") or self.generate_slug(ai_data.get("title", "editorial"))
             editorial_id = f"{date_str}-editorial-01"
 
+            # Auto-calculate dayNumber if missing
+            if "dayNumber" not in ai_data or not ai_data["dayNumber"]:
+                existing_count = 0
+                if INDEX_JSON_PATH.exists():
+                    try:
+                        with open(INDEX_JSON_PATH, "r", encoding="utf-8") as f:
+                            idx_data = json.load(f)
+                            existing_count = idx_data.get("totalEditorials", 0)
+                    except Exception:
+                        pass
+                ai_data["dayNumber"] = existing_count + 1
+
             # Enrich JSON metadata
             ai_data["id"] = editorial_id
             ai_data["slug"] = slug
@@ -94,8 +106,9 @@ class JSONManager:
         new_entry = {
             "id": ai_data["id"],
             "slug": ai_data["slug"],
+            "dayNumber": ai_data.get("dayNumber", 1),
             "date": ai_data["date"],
-            "title": ai_data["title"],
+            "title": ai_data.get("mainTopic") or ai_data.get("title", ""),
             "filePath": relative_file_path,
             "tags": ai_data.get("tags", []),
             "difficulty": ai_data.get("difficulty", "Intermediate")
@@ -132,22 +145,24 @@ class JSONManager:
                 with open(json_file, "r", encoding="utf-8") as f:
                     ed = json.load(f)
                     
-                ed_title = ed.get("title", "")
+                ed_title = ed.get("mainTopic") or ed.get("title", "")
                 ed_slug = ed.get("slug", "")
                 ed_date = ed.get("date", "")
                 
-                terminologies = ed.get("terminologies", [])
+                # Check both terminologies and section5_keywords
+                terminologies = ed.get("section5_keywords", []) or ed.get("terminologies", [])
                 for t in terminologies:
-                    term_name = t.get("term", "").strip()
+                    term_name = (t.get("word") or t.get("term") or "").strip()
                     if not term_name:
                         continue
                     
+                    simple_meaning = t.get("simpleMeaning") or t.get("simpleExplanation") or t.get("definition") or ""
                     key = term_name.lower()
                     if key not in terms_map:
                         terms_map[key] = {
                             "term": term_name,
-                            "definition": t.get("definition", ""),
-                            "simpleExplanation": t.get("simpleExplanation", ""),
+                            "definition": t.get("definition") or simple_meaning,
+                            "simpleExplanation": simple_meaning,
                             "editorials": []
                         }
                     

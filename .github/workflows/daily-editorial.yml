@@ -1,22 +1,32 @@
-name: Daily Editorial Pipeline
+name: Daily Editorial Pipeline & Deployment
 
 on:
   schedule:
-    # 8:00 AM IST (UTC+5:30) = 02:30 AM UTC
-    - cron: '30 2 * * *'
+    # 7:00 AM IST (UTC+5:30) = 01:30 AM UTC
+    - cron: '30 1 * * *'
   workflow_dispatch:
 
-# Minimum permissions needed to write JSON data commits back to repository
+# Permissions needed to commit JSON updates and deploy to GitHub Pages
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages-and-pipeline'
+  cancel-in-progress: false
 
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.git-check.outputs.changes }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -53,5 +63,30 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git commit -m "chore: add daily editorial analysis [skip ci]"
+          git commit -m "chore: auto-add daily editorial analysis"
           git push origin main
+
+  deploy-pages:
+    needs: run-pipeline
+    if: always()
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository (Latest main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Static Web Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

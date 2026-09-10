@@ -11,7 +11,7 @@ const EditorialLoader = {
     Utils.renderLoading(container);
 
     try {
-      const indexPath = Utils.getRelativePath('data/editorials/index.json');
+      const indexPath = Utils.getRelativePath('data/editorials/index.json') + '?t=' + Date.now();
       const indexResponse = await fetch(indexPath, { cache: 'no-cache' });
       
       if (!indexResponse.ok) {
@@ -32,8 +32,8 @@ const EditorialLoader = {
         if (found) targetMeta = found;
       }
 
-      const editorialJsonPath = Utils.getRelativePath(`data/editorials/${targetMeta.filePath}`);
-      const editorialResponse = await fetch(editorialJsonPath);
+      const editorialJsonPath = Utils.getRelativePath(`data/editorials/${targetMeta.filePath}`) + '?t=' + Date.now();
+      const editorialResponse = await fetch(editorialJsonPath, { cache: 'no-cache' });
 
       if (!editorialResponse.ok) {
         throw new Error(`Failed to load editorial details: ${editorialResponse.status}`);

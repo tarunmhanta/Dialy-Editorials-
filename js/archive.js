@@ -14,7 +14,7 @@ const ArchivePage = {
     Utils.renderLoading(container);
 
     try {
-      const indexPath = Utils.getRelativePath('data/editorials/index.json');
+      const indexPath = Utils.getRelativePath('data/editorials/index.json') + '?t=' + Date.now();
       const response = await fetch(indexPath, { cache: 'no-cache' });
       
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
