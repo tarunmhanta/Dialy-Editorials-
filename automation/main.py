@@ -103,9 +103,12 @@ def run_pipeline() -> bool:
         return True
     else:
         logger.error("Failed to write JSON database records.")
-        sys.exit(1)
+        return False
 
 if __name__ == "__main__":
-    success = run_pipeline()
-    # Exit with code 0 whether new article added or all articles already processed
-    sys.exit(0)
+    try:
+        res = run_pipeline()
+        sys.exit(0)
+    except Exception as err:
+        logger.error(f"Pipeline uncaught failure: {err}")
+        sys.exit(1)

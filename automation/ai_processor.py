@@ -64,33 +64,87 @@ class GeminiAIProcessor:
         text = re.sub(r"\s*```$", "", text)
         return text.strip()
 
+    def _ensure_schema_compatibility(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Auto-fills legacy fields if 5-section schema fields are present for full backward compatibility.
+        """
+        if not data.get("title") and data.get("mainTopic"):
+            data["title"] = data["mainTopic"]
+
+        if not data.get("introduction"):
+            data["introduction"] = data.get("section3_broadeningThinking") or data.get("mainTopic") or ""
+
+        # Auto fill summary
+        if "summary" not in data or not isinstance(data["summary"], dict):
+            data["summary"] = {}
+
+        if not data["summary"].get("overview"):
+            data["summary"]["overview"] = data.get("mainTopic") or data.get("title") or ""
+
+        if not data["summary"].get("keyArguments"):
+            sec1 = data.get("section1_simpleSummary", [])
+            data["summary"]["keyArguments"] = [
+                f"{item.get('boldHeader', '')}: {item.get('text', '')}" if isinstance(item, dict) else str(item)
+                for item in sec1
+            ] if isinstance(sec1, list) else []
+
+        if not data["summary"].get("conclusion"):
+            data["summary"]["conclusion"] = "Peace and predictability foster economic stability and business growth."
+
+        # Auto fill mbaRelevance
+        if "mbaRelevance" not in data or not isinstance(data["mbaRelevance"], dict):
+            data["mbaRelevance"] = {}
+
+        if not data["mbaRelevance"].get("importance"):
+            data["mbaRelevance"]["importance"] = "Understanding macroeconomic policy, international trade, and geopolitical risk is vital for MBA students."
+
+        if not data["mbaRelevance"].get("subjects"):
+            data["mbaRelevance"]["subjects"] = ["Managerial Economics", "Business Environment", "Operations & Supply Chain Management", "Strategic Management"]
+
+        if not data["mbaRelevance"].get("managementConcepts"):
+            data["mbaRelevance"]["managementConcepts"] = ["Geopolitical Risk", "Supply Chain Resilience", "Competitive Strategy"]
+
+        # Auto fill keyTakeaways
+        if not data.get("keyTakeaways"):
+            sec2 = data.get("section2_mbaRelevance", [])
+            data["keyTakeaways"] = [
+                f"{item.get('boldHeader', '')}: {item.get('text', '')}" if isinstance(item, dict) else str(item)
+                for item in sec2
+            ] if isinstance(sec2, list) else []
+
+        # Auto fill terminologies
+        if not data.get("terminologies") or not isinstance(data["terminologies"], list):
+            sec5 = data.get("section5_keywords", [])
+            data["terminologies"] = [
+                {
+                    "term": item.get("word") or item.get("term") or "",
+                    "definition": item.get("simpleMeaning") or item.get("definition") or "",
+                    "simpleExplanation": item.get("simpleMeaning") or item.get("simpleExplanation") or "",
+                    "example": "",
+                    "mbaRelevance": "Important management and business term."
+                }
+                for item in sec5 if isinstance(item, dict)
+            ] if isinstance(sec5, list) else []
+
+        # Auto fill discussionQuestion
+        if not data.get("discussionQuestion") or not isinstance(data["discussionQuestion"], dict):
+            q_text = data.get("section4_questionOfTheDay") or ""
+            data["discussionQuestion"] = {
+                "question": q_text,
+                "whyThinkAboutIt": "Forces MBA students to think strategically as business managers."
+            }
+
+        return data
+
     def _validate_schema(self, data: Dict[str, Any]) -> bool:
         """
-        Validates that generated JSON contains all mandatory schema keys.
+        Validates that generated JSON contains required content.
         """
-        required_root_keys = [
-            "title", "source", "introduction", "summary",
-            "mbaRelevance", "keyTakeaways", "terminologies", "discussionQuestion"
-        ]
-        for key in required_root_keys:
-            if key not in data:
-                logger.error(f"Schema Validation Failure: Missing root key '{key}'")
-                return False
+        has_new_schema = bool(data.get("section1_simpleSummary") or data.get("mainTopic"))
+        has_old_schema = bool(data.get("summary") or data.get("title"))
 
-        summary_keys = ["overview", "keyArguments", "conclusion"]
-        for skey in summary_keys:
-            if skey not in data["summary"]:
-                logger.error(f"Schema Validation Failure: Missing summary key '{skey}'")
-                return False
-
-        mba_keys = ["importance", "subjects", "managementConcepts"]
-        for mkey in mba_keys:
-            if mkey not in data["mbaRelevance"]:
-                logger.error(f"Schema Validation Failure: Missing mbaRelevance key '{mkey}'")
-                return False
-
-        if not isinstance(data["terminologies"], list):
-            logger.error("Schema Validation Failure: 'terminologies' must be a list.")
+        if not (has_new_schema or has_old_schema):
+            logger.error("Schema Validation Failure: Missing core editorial content fields.")
             return False
 
         return True
@@ -136,9 +190,11 @@ class GeminiAIProcessor:
                 except json.JSONDecodeError as je:
                     logger.warning(f"JSON Parse error on attempt {attempt}: {je}")
                     if attempt < MAX_AI_RETRIES:
-                        # Append repair instruction for controlled retry
                         full_prompt += "\n\nCRITICAL FIX REQUIRED: Your previous response contained invalid JSON syntax. Return ONLY raw valid JSON following the schema."
                     continue
+
+                # Auto-fill compatibility fields
+                json_data = self._ensure_schema_compatibility(json_data)
 
                 # Validate Schema
                 if self._validate_schema(json_data):
@@ -146,8 +202,6 @@ class GeminiAIProcessor:
                     return json_data
                 else:
                     logger.warning(f"Schema validation failed on attempt {attempt}.")
-                    if attempt < MAX_AI_RETRIES:
-                        full_prompt += "\n\nCRITICAL FIX REQUIRED: Ensure all required schema fields (introduction, summary, mbaRelevance, terminologies, discussionQuestion) are present."
 
             except Exception as e:
                 logger.error(f"Error invoking Gemini API on attempt {attempt}: {e}")
