@@ -29,9 +29,16 @@ def run_pipeline() -> bool:
     logger.info("==================================================")
 
     # Step 1: Validate Environment Variables
-    if not os.getenv("GEMINI_API_KEY"):
-        logger.error("MANDATORY FAILURE: GEMINI_API_KEY environment variable is missing.")
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        logger.error("=" * 60)
+        logger.error("❌ CRITICAL FAILURE: GEMINI_API_KEY is missing or empty in GitHub Secrets!")
+        logger.error("Please ensure you have added 'GEMINI_API_KEY' in:")
+        logger.error("GitHub Repo -> Settings -> Secrets and variables -> Actions -> Repository secrets")
+        logger.error("=" * 60)
         sys.exit(1)
+
+    logger.info(f"Verified GEMINI_API_KEY is present (length: {len(api_key)} chars).")
 
     # Step 2: Initialize Discovery Scraper & Duplicate Checker
     scraper = EditorialScraper()
@@ -108,6 +115,7 @@ def run_pipeline() -> bool:
         sys.exit(1)
 
 if __name__ == "__main__":
+    import traceback
     try:
         res = run_pipeline()
         if res:
@@ -119,4 +127,5 @@ if __name__ == "__main__":
         raise
     except Exception as err:
         logger.error(f"Pipeline uncaught failure: {err}")
+        traceback.print_exc()
         sys.exit(1)
