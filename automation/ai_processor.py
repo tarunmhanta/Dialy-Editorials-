@@ -12,6 +12,7 @@ from pathlib import Path
 
 from config import (
     GEMINI_MODEL_NAME,
+    GEMINI_FALLBACK_MODELS,
     GEMINI_API_KEY_ENV,
     PROMPT_FILE_PATH,
     MAX_AI_RETRIES
@@ -165,46 +166,53 @@ class GeminiAIProcessor:
 
         full_prompt = f"{base_prompt}\n\n{user_input}"
 
-        for attempt in range(1, MAX_AI_RETRIES + 1):
-            try:
-                logger.info(f"Sending article to Gemini AI (Attempt {attempt}/{MAX_AI_RETRIES})...")
-                
-                response = self.client.models.generate_content(
-                    model=GEMINI_MODEL_NAME,
-                    contents=full_prompt,
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        temperature=0.3
-                    )
-                )
+        models_to_try = [GEMINI_MODEL_NAME] + [m for m in GEMINI_FALLBACK_MODELS if m != GEMINI_MODEL_NAME]
 
-                if not response or not response.text:
-                    logger.warning("Empty response received from Gemini API.")
-                    continue
-
-                clean_text = self._clean_raw_response(response.text)
-                
-                # Parse JSON
+        for model_name in models_to_try:
+            for attempt in range(1, MAX_AI_RETRIES + 1):
                 try:
-                    json_data = json.loads(clean_text)
-                except json.JSONDecodeError as je:
-                    logger.warning(f"JSON Parse error on attempt {attempt}: {je}")
-                    if attempt < MAX_AI_RETRIES:
-                        full_prompt += "\n\nCRITICAL FIX REQUIRED: Your previous response contained invalid JSON syntax. Return ONLY raw valid JSON following the schema."
-                    continue
+                    logger.info(f"Sending article to Gemini AI using model '{model_name}' (Attempt {attempt}/{MAX_AI_RETRIES})...")
+                    
+                    response = self.client.models.generate_content(
+                        model=model_name,
+                        contents=full_prompt,
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            temperature=0.3
+                        )
+                    )
 
-                # Auto-fill compatibility fields
-                json_data = self._ensure_schema_compatibility(json_data)
+                    if not response or not response.text:
+                        logger.warning(f"Empty response received from Gemini API using model '{model_name}'.")
+                        continue
 
-                # Validate Schema
-                if self._validate_schema(json_data):
-                    logger.info("Successfully validated Gemini AI structured JSON output.")
-                    return json_data
-                else:
-                    logger.warning(f"Schema validation failed on attempt {attempt}.")
+                    clean_text = self._clean_raw_response(response.text)
+                    
+                    # Parse JSON
+                    try:
+                        json_data = json.loads(clean_text)
+                    except json.JSONDecodeError as je:
+                        logger.warning(f"JSON Parse error on attempt {attempt}: {je}")
+                        if attempt < MAX_AI_RETRIES:
+                            full_prompt += "\n\nCRITICAL FIX REQUIRED: Your previous response contained invalid JSON syntax. Return ONLY raw valid JSON following the schema."
+                        continue
 
-            except Exception as e:
-                logger.error(f"Error invoking Gemini API on attempt {attempt}: {e}")
+                    # Auto-fill compatibility fields
+                    json_data = self._ensure_schema_compatibility(json_data)
 
-        logger.error(f"Failed to generate valid structured JSON after {MAX_AI_RETRIES} attempts.")
+                    # Validate Schema
+                    if self._validate_schema(json_data):
+                        logger.info(f"Successfully validated Gemini AI structured JSON output from model '{model_name}'.")
+                        return json_data
+                    else:
+                        logger.warning(f"Schema validation failed on attempt {attempt} with model '{model_name}'.")
+
+                except Exception as e:
+                    logger.error(f"Error invoking Gemini API with model '{model_name}' on attempt {attempt}: {e}")
+                    # If model not found, don't retry same model - break to try next model immediately
+                    if "not found" in str(e).lower() or "404" in str(e):
+                        logger.warning(f"Model '{model_name}' not found. Trying fallback model...")
+                        break
+
+        logger.error("Failed to generate valid structured JSON across all attempted models.")
         return None

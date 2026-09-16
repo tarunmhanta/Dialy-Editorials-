@@ -35,7 +35,8 @@ HTTP_MAX_RETRIES = 3
 MIN_ARTICLE_CHAR_LENGTH = 400
 
 # Gemini AI Settings
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
+GEMINI_MODEL_NAME = "gemini-2.0-flash"
+GEMINI_FALLBACK_MODELS = ["gemini-1.5-flash", "gemini-2.0-flash-lite"]
 MAX_AI_RETRIES = 2
 
 # Security Environment Variable Name
