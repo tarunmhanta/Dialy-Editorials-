@@ -45,8 +45,9 @@ jobs:
         id: run-pipeline
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          PYTHONUNBUFFERED: "1"
         run: |
-          set +e  # Don't exit on non-zero exit codes
+          set +e
           python automation/main.py
           EXIT_CODE=$?
           echo "Pipeline exited with code: $EXIT_CODE"
@@ -54,23 +55,13 @@ jobs:
             echo "pipeline_result=new_editorial" >> $GITHUB_OUTPUT
             echo "✅ SUCCESS: New editorial was processed and saved!"
           elif [ $EXIT_CODE -eq 2 ]; then
-            echo "pipeline_result=no_new_article" >> $GITHUB_OUTPUT
-            echo "ℹ️ INFO: No new editorial found today. Pipeline ran cleanly - nothing to do."
+            echo "pipeline_result=up_to_date" >> $GITHUB_OUTPUT
+            echo "ℹ️ Database is already up to date with the latest editorials."
           else
             echo "pipeline_result=error" >> $GITHUB_OUTPUT
             echo "❌ ERROR: Pipeline failed with exit code $EXIT_CODE!"
-            exit 1  # Only fail the step on actual errors
+            exit 1
           fi
-
-      - name: Show Git Status (Debug)
-        run: |
-          echo "=== Git Status ==="
-          git status
-          echo ""
-          echo "=== Data folder contents ==="
-          ls -la data/editorials/ 2>/dev/null || echo "(data/editorials/ not found)"
-          ls -la data/editorials/2026/ 2>/dev/null || echo "(no 2026 subfolder)"
-          find data/ -name "*.json" -newer data/editorials/index.json 2>/dev/null | head -20 || echo "(no newer JSON files found)"
 
       - name: Check for Data Changes
         id: git-check
@@ -99,7 +90,7 @@ jobs:
 
   deploy-pages:
     needs: run-pipeline
-    if: always()
+    if: always() && needs.run-pipeline.result == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

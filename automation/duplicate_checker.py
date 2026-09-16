@@ -37,24 +37,24 @@ class DuplicateChecker:
 
     def is_duplicate(self, candidate_url: str, candidate_title: str) -> bool:
         """
-        Determines whether candidate URL or Title matches any existing entry.
+        Determines whether candidate URL, slug, or Title matches any existing entry.
         """
         clean_url = candidate_url.strip().split("?")[0].rstrip("/")
         clean_title = candidate_title.strip().lower()
 
         for record in self.existing_records:
-            # Check source URL match
-            source_url = record.get("source", {}).get("url", "")
+            # 1. Check source URL match
+            source_url = record.get("sourceUrl") or record.get("source", {}).get("url", "")
             if source_url:
                 clean_record_url = source_url.strip().split("?")[0].rstrip("/")
                 if clean_record_url == clean_url:
                     logger.info(f"Duplicate detected by URL: {candidate_url}")
                     return True
 
-            # Check title similarity / exact match
+            # 2. Check title similarity / exact match
             record_title = record.get("title", "").strip().lower()
-            if record_title and record_title == clean_title:
-                logger.info(f"Duplicate detected by Title match: '{candidate_title}'")
+            if record_title and (record_title == clean_title or record_title in clean_title or clean_title in record_title):
+                logger.info(f"Duplicate detected by Title match: '{candidate_title}' (matches '{record.get('title')}')")
                 return True
 
         return False

@@ -110,6 +110,7 @@ class JSONManager:
             "date": ai_data["date"],
             "title": ai_data.get("mainTopic") or ai_data.get("title", ""),
             "filePath": relative_file_path,
+            "sourceUrl": ai_data.get("source", {}).get("url", ""),
             "tags": ai_data.get("tags", []),
             "difficulty": ai_data.get("difficulty", "Intermediate")
         }

@@ -1,7 +1,7 @@
 """
-MBA EDITORIAL DAILY - ARTICLE EXTRACTOR MODULE (UPDATED)
-Fetches available preview from Indian Express and supplements with web search context.
-Falls back to title-based analysis when article is behind paywall.
+MBA EDITORIAL DAILY - ARTICLE EXTRACTOR MODULE
+Fetches individual Indian Express editorial article pages and extracts complete body text.
+Includes automatic fallback to Indian Express /lite/ endpoint for clean, reliable content.
 """
 
 from typing import Dict, Any, Optional
@@ -10,50 +10,33 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime
 
-from config import HTTP_HEADERS, HTTP_TIMEOUT_SECONDS, MIN_ARTICLE_CHAR_LENGTH
+from config import HTTP_HEADERS, HTTP_TIMEOUT_SECONDS
 from logger import logger
 
-# Reduced minimum threshold since IE is paywalled - we'll use preview + title context
-PAYWALL_MIN_CHARS = 200
+# Indian Express editorials are typically 1,200 - 3,500 characters (3-5 focused paragraphs)
+MIN_CONTENT_LENGTH = 300
 
 class ArticleExtractor:
     """
     Extracts structured body content and metadata from an Indian Express editorial page.
-    Works with paywalled pages by using available preview + title context.
     """
 
-    def fetch_page(self, url: str) -> Optional[str]:
-        """Downloads article HTML with error handling."""
+    def fetch_html(self, url: str) -> Optional[str]:
+        """Downloads page HTML with standard browser headers."""
         try:
-            logger.info(f"Extracting article page content from: {url}")
+            logger.info(f"Fetching article content from: {url}")
             response = requests.get(url, headers=HTTP_HEADERS, timeout=HTTP_TIMEOUT_SECONDS)
             if response.status_code == 200:
                 return response.text
             else:
-                logger.error(f"Failed to fetch article page. HTTP Status: {response.status_code}")
+                logger.warning(f"Fetch failed for {url} with status {response.status_code}")
                 return None
         except Exception as e:
-            logger.error(f"Exception during article fetch: {e}")
+            logger.error(f"Exception during article fetch from {url}: {e}")
             return None
 
-    def is_paywalled(self, soup: BeautifulSoup) -> bool:
-        """Detects if page content is behind a paywall."""
-        page_text = soup.get_text().lower()
-        paywall_signals = ["subscribe to continue", "subscribe now", "already a subscriber", 
-                           "this content is available", "premium article", "paywall"]
-        return any(signal in page_text for signal in paywall_signals)
-
-    def extract_article(self, url: str, fallback_title: str = "") -> Optional[Dict[str, Any]]:
-        """
-        Parses page HTML, extracts available preview content.
-        For paywalled articles, uses title + preview + editorial URL for Gemini context.
-        """
-        html_text = self.fetch_page(url)
-        if not html_text:
-            return None
-
-        soup = BeautifulSoup(html_text, "html.parser")
-
+    def _extract_from_soup(self, soup: BeautifulSoup, url: str, fallback_title: str = "") -> Optional[Dict[str, Any]]:
+        """Extracts metadata and body paragraphs from parsed HTML soup."""
         # 1. Extract Title
         title = ""
         h1 = soup.find("h1", class_=lambda c: c and ("native" in c or "title" in c or "heading" in c))
@@ -64,8 +47,8 @@ class ArticleExtractor:
         if not title:
             title = fallback_title
 
-        # Clean title - remove "Opinion" prefix that IE adds
-        title = re.sub(r'^Opinion\s*', '', title).strip()
+        # Clean title - remove "Opinion" or "Editorial:" prefix that IE sometimes prefixes
+        title = re.sub(r'^(?:Opinion|Editorial|IE Editorial)\s*[:|-]?\s*', '', title, flags=re.IGNORECASE).strip()
 
         # 2. Extract Author
         author = "Editorial Board"
@@ -77,16 +60,17 @@ class ArticleExtractor:
 
         # 3. Extract Date
         date_str = datetime.utcnow().strftime("%Y-%m-%d")
-        # Try meta tags first (most reliable)
         date_meta = soup.find("meta", {"property": "article:published_time"})
         if not date_meta:
             date_meta = soup.find("meta", {"name": "publish-date"})
+        if not date_meta:
+            date_meta = soup.find("meta", {"name": "date"})
+
         if date_meta and date_meta.get("content"):
             match = re.search(r"(\d{4}-\d{2}-\d{2})", date_meta["content"])
             if match:
                 date_str = match.group(1)
         else:
-            # Fallback: search in page text
             time_tag = soup.find(["meta", "time", "span"], class_=lambda c: c and ("date" in c or "time" in c or "publish" in c))
             if time_tag:
                 raw_date = time_tag.get("content", "") or time_tag.get_text(strip=True)
@@ -94,70 +78,78 @@ class ArticleExtractor:
                 if match:
                     date_str = match.group(1)
 
-        # 4. Extract All Available Paragraphs (preview)
-        # Try specific IE containers first
-        story_div = soup.find("div", class_=lambda c: c and ("disc-paragraph" in c or "story_details" in c or "full-details" in c or "art-content" in c))
+        # 4. Locate Story Container
+        story_div = soup.find("div", class_=lambda c: c and ("disc-paragraph" in c or "story_details" in c or "full-details" in c or "art-content" in c or "story-details" in c))
         if not story_div:
             story_div = soup.find("div", id="storydetails")
         if not story_div:
-            story_div = soup.find("main") or soup.find("body")
+            story_div = soup.find("div", class_="app-content")
+        if not story_div:
+            story_div = soup.find("main") or soup.find("article") or soup.find("body")
 
+        if not story_div:
+            return None
+
+        # Clean noise tags
+        unwanted_selectors = [
+            "script", "style", "iframe", "ins", "header", "footer", "nav",
+            ".ad-container", ".advertisement", ".social-share", ".read-also",
+            ".newsletter-box", ".ie-app-download", ".comment-box", ".related-articles",
+            ".custom-ad", "#comments", ".tags", ".story-tags", ".premium-banner"
+        ]
+        for sel in unwanted_selectors:
+            for el in story_div.select(sel):
+                el.decompose()
+
+        # Extract all meaningful paragraphs
         paragraphs = []
-        if story_div:
-            # Remove boilerplate
-            for sel in ["script", "style", "iframe", "ins", "header", "footer", "nav",
-                        ".ad-container", ".advertisement", ".social-share", ".read-also",
-                        ".newsletter-box", ".ie-app-download", ".comment-box", ".related-articles",
-                        ".custom-ad", "#comments", ".tags"]:
-                for el in story_div.select(sel):
-                    el.decompose()
+        for p in story_div.find_all("p"):
+            p_text = p.get_text(strip=True)
+            if len(p_text) > 30 and not any(phrase in p_text.lower() for phrase in [
+                "subscribe to", "download the app", "click here", "read also", "for more latest news",
+                "follow us on", "get our newsletter", "express explained", "first published on"
+            ]):
+                paragraphs.append(p_text)
 
-            for p in story_div.find_all("p"):
-                p_text = p.get_text(strip=True)
-                if len(p_text) > 25 and not any(phrase in p_text.lower() for phrase in [
-                    "subscribe to", "download the app", "click here", "read also", "for more latest news",
-                    "follow us on", "get our newsletter"
-                ]):
-                    paragraphs.append(p_text)
+        full_content = "\n\n".join(paragraphs)
 
-        preview_text = "\n\n".join(paragraphs)
-        paywalled = self.is_paywalled(soup)
-
-        # 5. Build enriched content for Gemini
-        if paywalled or len(preview_text) < MIN_ARTICLE_CHAR_LENGTH:
-            logger.warning(f"Article appears paywalled. Only {len(preview_text)} chars available. Using title + preview context for Gemini analysis.")
-
-            # Build Gemini-ready context from available info
-            full_content = f"""EDITORIAL TITLE: {title}
-
-PUBLICATION: The Indian Express (Indian national newspaper, editorial section)
-DATE: {date_str}
-ARTICLE URL: {url}
-
-AVAILABLE PREVIEW TEXT:
-{preview_text if preview_text else "No preview available."}
-
-INSTRUCTION FOR ANALYSIS:
-This is an Indian Express editorial. Even with limited preview text, use your knowledge of:
-- The title topic and its current context in India
-- Related economic, political, and policy developments in India
-- Recent news and events related to this topic
-- Standard editorial positions Indian Express typically takes on such issues
-
-Generate a thorough, educational MBA-focused analysis based on the editorial title, topic, and available context.
-Be specific about real policy, economic data, and business implications relevant to this topic.
-"""
-        else:
-            full_content = preview_text
-            logger.info(f"Successfully extracted full article content ({len(full_content)} characters).")
-
-        logger.info(f"Article ready for AI processing: '{title}' ({len(full_content)} chars, paywalled={paywalled})")
+        if len(full_content) < MIN_CONTENT_LENGTH:
+            return None
 
         return {
             "title": title,
             "url": url,
             "author": author,
             "date": date_str,
-            "content": full_content,
-            "paywalled": paywalled
+            "content": full_content
         }
+
+    def extract_article(self, url: str, fallback_title: str = "") -> Optional[Dict[str, Any]]:
+        """
+        Attempts standard page extraction first.
+        If blocked or incomplete, automatically falls back to Indian Express /lite/ endpoint.
+        """
+        # 1. Attempt primary URL
+        clean_url = url.split("?")[0].rstrip("/")
+        html_text = self.fetch_html(clean_url + "/")
+        
+        if html_text:
+            soup = BeautifulSoup(html_text, "html.parser")
+            data = self._extract_from_soup(soup, clean_url, fallback_title)
+            if data and len(data["content"]) >= MIN_CONTENT_LENGTH:
+                logger.info(f"Successfully extracted full article '{data['title']}' ({len(data['content'])} characters).")
+                return data
+
+        # 2. Attempt /lite/ endpoint fallback
+        lite_url = f"{clean_url}/lite/"
+        logger.info(f"Attempting /lite/ fallback endpoint: {lite_url}")
+        lite_html = self.fetch_html(lite_url)
+        if lite_html:
+            soup = BeautifulSoup(lite_html, "html.parser")
+            data = self._extract_from_soup(soup, clean_url, fallback_title)
+            if data and len(data["content"]) >= MIN_CONTENT_LENGTH:
+                logger.info(f"Successfully extracted via /lite/ endpoint: '{data['title']}' ({len(data['content'])} characters).")
+                return data
+
+        logger.error(f"Failed to extract article content from {url} across all methods.")
+        return None
